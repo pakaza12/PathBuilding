@@ -8,9 +8,7 @@ public class Grid {
 	public final int columnMin = 1;
 	public int rowNum = 1;
 	public int columnNum = 1;
-	// public matrix grid;
-	// Then initialize the grid based off size. Make bigger/smaller reinitialize
-	public Node grid[][] = new Node[1][1];
+	public Node grid[][];
 	
 	public Grid(int rowNum, int columnNum) {
 		if(rowNum < 1 || columnNum < 1) {
@@ -19,13 +17,12 @@ public class Grid {
 		this.rowNum = rowNum;
 		this.columnNum = columnNum;
 		
-		grid = null;
 		grid = new Node[this.rowNum][this.columnNum];
 		initGridNodes();
 	}
 
 	public int getRowNum() {
-		return rowNum;
+		return this.rowNum;
 	}
 
 	public void setRowNum(int rowNum) {
@@ -33,7 +30,7 @@ public class Grid {
 	}
 
 	public int getColumnNum() {
-		return columnNum;
+		return this.columnNum;
 	}
 
 	public void setColumnNum(int columnNum) {
@@ -41,11 +38,11 @@ public class Grid {
 	}
 
 	public int getRowMin() {
-		return rowMin;
+		return this.rowMin;
 	}
 
 	public int getColumnMin() {
-		return columnMin;
+		return this.columnMin;
 	}
 	
 	/**
@@ -53,10 +50,24 @@ public class Grid {
 	 * spaces with blank nodes
 	 */
 	public void addRow() {
+		/** Adds 1 to rowNum **/
 		setRowNum(this.rowNum + 1);
+		
+		Node temp[][] = grid;
 		grid = null;
-		grid = new Node[this.rowNum][this.columnNum];
-		initGridNodes();
+		grid = new Node[rowNum][columnNum];
+		
+		/** 
+		 * Copies the nodes from the original grid 
+		 * into the new grid with one more row
+		 */
+		for(int i = 0; i < rowNum-1; i++) {
+			for(int j = 0; j < columnNum; j++) {
+				grid[i][j] = temp[i][j];
+			}
+		}
+		
+		initRowNodes();
 	}
 	
 	/**
@@ -64,20 +75,47 @@ public class Grid {
 	 * spaces with blank nodes
 	 */
 	public void addColumn() {
+		/** Adds 1 to columnNum **/
 		setColumnNum(this.columnNum + 1);
+		
+		Node temp[][] = grid;
 		grid = null;
-		grid = new Node[this.rowNum][this.columnNum];
-		initGridNodes();
+		grid = new Node[rowNum][columnNum];
+		
+		/** 
+		 * Copies the nodes from the original grid 
+		 * into the new grid with one more column
+		 */
+		for(int i = 0; i < rowNum; i++) {
+			for(int j = 0; j < columnNum-1; j++) {
+				grid[i][j] = temp[i][j];
+			}
+		}
+		
+		initColumnNodes();
 	}
 	
 	/**
 	 * Takes away one row from the grid
 	 */
 	public void subtractRow() {
-		if(this.rowNum > rowMin) {
-			setRowNum(this.rowNum - 1);
+		if(rowNum > rowMin) {
+			setRowNum(rowNum - 1);
+			
+			Node temp[][] = grid;
 			grid = null;
-			grid = new Node[this.rowNum][this.columnNum];
+			grid = new Node[rowNum][columnNum];
+			
+			/**
+			 * Copies the nodes from the original grid 
+			 * into the new grid with one less row
+			 */
+			for(int i = 0; i < rowNum; i++) {
+				for(int j = 0; j < columnNum; j++) {
+					grid[i][j] = temp[i][j];
+				}
+			}
+			
 			initGridNodes();
 		} else {
 			throw new RuntimeException("You cannot have less than 1 row"); //Might need to be a print statement
@@ -88,27 +126,69 @@ public class Grid {
 	 * Takes away one column from the grid
 	 */
 	public void subtractColumn() {
-		if(this.columnNum > columnMin) {
-			setColumnNum(this.columnNum - 1);
+		if(columnNum > columnMin) {
+			setColumnNum(columnNum - 1);
+			
+			Node temp[][] = grid;
 			grid = null;
-			grid = new Node[this.rowNum][this.columnNum];
+			grid = new Node[rowNum][columnNum];
+			
+			/** 
+			 * Copies the nodes from the original grid 
+			 * into the new grid with one less column
+			 */
+			for(int i = 0; i < rowNum; i++) {
+				for(int j = 0; j < columnNum; j++) {
+					grid[i][j] = temp[i][j];
+				}
+			}
+			
 			initGridNodes();
 		} else {
 			throw new RuntimeException("You cannot have less than 1 column"); //Might need to be a print statement
 		}
 	}
 	
+	/**
+	 * Adds empty nodes into the entire grid. Only should be
+	 * done while creating a new grid or while wanting to 
+	 * clear the old grid
+	 */
 	public void initGridNodes() {
-		//System.out.printf("%d %d\n", this.rowNum, this.columnNum);
+		//System.out.printf("%d %d\n", rowNum, columnNum);
 		Node a = new Node(false, false, false, false);
-		for(int i = 0; i < this.rowNum; i++) {
-			for(int j = 0; j < this.columnNum; j++) {
+		for(int i = 0; i < rowNum; i++) {
+			for(int j = 0; j < columnNum; j++) {
 				grid[i][j] = a;
 			}
 		}
 	}
 	
+	/**
+	 * Adds empty nodes into the new row within
+	 * the new, larger grid
+	 */
+	public void initRowNodes() {
+		Node a = new Node(false, false, false, false);
+		for(int i = rowNum-1; i < rowNum; i++) {
+			for(int j = 0; j < columnNum; j++) {
+				grid[i][j] = a;
+			}
+		}
+	}
 	
+	/**
+	 * Adds empty nodes into the new column within
+	 * the new, larger grid
+	 */
+	public void initColumnNodes() {
+		Node a = new Node(false, false, false, false);
+		for(int i = 0; i < rowNum; i++) {
+			for(int j = columnNum-1; j < columnNum; j++) {
+				grid[i][j] = a;
+			}
+		}
+	}
 	
 	
 	
@@ -123,7 +203,7 @@ public class Grid {
 	public void printGrid() {
 		for(int i = 0; i < rowNum; i++) {
 			for(int j = 0; j < columnNum; j++) {
-				if(!this.grid[i][j].isBarrier && !this.grid[i][j].isEnd && !this.grid[i][j].isStart) {
+				if(!grid[i][j].isBarrier && !grid[i][j].isEnd && !grid[i][j].isStart) {
 					System.out.printf(" 0 ");
 				} else {
 					System.out.printf(" 1 ");
@@ -138,6 +218,12 @@ public class Grid {
 	
 	public static void main(String[] args) {
 		Grid a = new Grid(2, 2);
+		a.printGrid();
+		a.addRow();
+		a.printGrid();
+		a.addColumn();
+		a.printGrid();
+		a.subtractColumn();
 		a.printGrid();
 	}
 	
