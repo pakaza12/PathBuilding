@@ -68,6 +68,12 @@ public class Node {
 		this.isBarrier = isBarrier;
 	}
 
+	@Override
+	public String toString() {
+		return "Node [discovered=" + discovered + ", neighbors=" + neighbors + ", isStart=" + isStart + ", isEnd="
+				+ isEnd + ", isBarrier=" + isBarrier + "]";
+	}
+
 	
 	
 }

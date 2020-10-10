@@ -9,6 +9,9 @@ public class Grid {
 	public int rowNum = 1;
 	public int columnNum = 1;
 	public Node grid[][];
+	public int start[] = {-1,-1};
+	public int end[] = {-1,-1};
+	
 	
 	public Grid(int rowNum, int columnNum) {
 		if(rowNum < 1 || columnNum < 1) {
@@ -156,9 +159,9 @@ public class Grid {
 	 */
 	public void initGridNodes() {
 		//System.out.printf("%d %d\n", rowNum, columnNum);
-		Node a = new Node(false, false, false, false);
 		for(int i = 0; i < rowNum; i++) {
 			for(int j = 0; j < columnNum; j++) {
+				Node a = new Node(false, false, false, false);
 				grid[i][j] = a;
 			}
 		}
@@ -169,9 +172,9 @@ public class Grid {
 	 * the new, larger grid
 	 */
 	public void initRowNodes() {
-		Node a = new Node(false, false, false, false);
 		for(int i = rowNum-1; i < rowNum; i++) {
 			for(int j = 0; j < columnNum; j++) {
+				Node a = new Node(false, false, false, false);
 				grid[i][j] = a;
 			}
 		}
@@ -182,11 +185,37 @@ public class Grid {
 	 * the new, larger grid
 	 */
 	public void initColumnNodes() {
-		Node a = new Node(false, false, false, false);
 		for(int i = 0; i < rowNum; i++) {
 			for(int j = columnNum-1; j < columnNum; j++) {
+				Node a = new Node(false, false, false, false);
 				grid[i][j] = a;
 			}
+		}
+	}
+	
+	/**
+	 * Add a start space into the given row/column.
+	 * If there is already a start space, replace it.
+	 */
+	public void addStart(int row, int column) {
+		//If you try make a space outside the grid the start, print an error
+		if(row < 0 || column < 0 || row > rowNum-1 || column > columnNum-1) {
+			throw new RuntimeException("The selected space is not within the grid");
+		}
+		
+		//If the start space already exists, change the start space
+		if(start[0] >= 0 && start[1] >= 0) {
+			System.out.printf("The start space has already been set at [%d][%d]\nWe will move the start to [%d][%d]\n", start[0], start[1], row, column);
+			grid[start[0]][start[1]].isStart = false;
+			grid[row][column].setStart(true);
+			start[0] = row;
+			start[1] = column;
+			
+		//If the start space doesn't exist, set the start space
+		} else {
+			grid[row][column].setStart(true);
+			start[0] = row;
+			start[1] = column;
 		}
 	}
 	
@@ -203,10 +232,12 @@ public class Grid {
 	public void printGrid() {
 		for(int i = 0; i < rowNum; i++) {
 			for(int j = 0; j < columnNum; j++) {
-				if(!grid[i][j].isBarrier && !grid[i][j].isEnd && !grid[i][j].isStart) {
+				if(!(grid[i][j].isBarrier || grid[i][j].isEnd || grid[i][j].isStart)) {
 					System.out.printf(" 0 ");
-				} else {
+				} else if(grid[i][j].isStart) {
 					System.out.printf(" 1 ");
+				} else {
+					System.out.printf(" 2 ");
 				}
 			}
 			System.out.println();
@@ -225,6 +256,12 @@ public class Grid {
 		a.printGrid();
 		a.subtractColumn();
 		a.printGrid();
+		a.addStart(1, 1);
+		a.printGrid();
+		a.addStart(0, 0);
+		a.addColumn();
+		a.printGrid();
+		
 	}
 	
 }
