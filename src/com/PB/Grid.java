@@ -105,6 +105,11 @@ public class Grid {
 		if(rowNum > rowMin) {
 			setRowNum(rowNum - 1);
 			
+			if(start[0] == rowNum-1) {
+				start[0] = -1;
+				start[1] = -1;
+			}
+			
 			Node temp[][] = grid;
 			grid = null;
 			grid = new Node[rowNum][columnNum];
@@ -131,6 +136,11 @@ public class Grid {
 	public void subtractColumn() {
 		if(columnNum > columnMin) {
 			setColumnNum(columnNum - 1);
+			
+			if(start[1] == columnNum-1) {
+				start[0] = -1;
+				start[1] = -1;
+			}
 			
 			Node temp[][] = grid;
 			grid = null;
@@ -260,6 +270,10 @@ public class Grid {
 		a.printGrid();
 		a.addStart(0, 0);
 		a.addColumn();
+		a.printGrid();
+		a.addStart(2, 2);
+		a.printGrid();
+		a.subtractColumn();
 		a.printGrid();
 		
 	}
