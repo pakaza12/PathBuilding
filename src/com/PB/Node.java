@@ -56,7 +56,7 @@ public class Node {
 		return isEnd;
 	}
 
-	public void setGoal(boolean isEnd) {
+	public void setEnd(boolean isEnd) {
 		this.isEnd = isEnd;
 	}
 

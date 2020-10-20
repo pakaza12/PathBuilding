@@ -3,6 +3,14 @@ package com.PB;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * This class represents a grid and search functions to search
+ * the grid. Each spot in the grid is filled with a node from
+ * the Node class. Representing an empty node, a barrier node,
+ * a start node, or an end node.
+ * 
+ * @author Parker Zach
+ */
 public class Grid {
 	public final int rowMin = 1;
 	public final int columnMin = 1;
@@ -46,6 +54,22 @@ public class Grid {
 
 	public int getColumnMin() {
 		return this.columnMin;
+	}
+	
+	public void printStart() {
+		if(start[0] == -1 || start[1] == -1) {
+			System.out.printf("There is no start space\n");
+		} else {
+			System.out.printf("[%d][%d]\n", start[0], start[1]);
+		}
+	}
+	
+	public void printEnd() {
+		if(end[0] == -1 || end[1] == -1) {
+			System.out.printf("There is no end space\n");
+		} else {
+			System.out.printf("[%d][%d]\n", end[0], end[1]);
+		}
 	}
 	
 	/**
@@ -103,12 +127,15 @@ public class Grid {
 	 */
 	public void subtractRow() {
 		if(rowNum > rowMin) {
-			setRowNum(rowNum - 1);
-			
 			if(start[0] == rowNum-1) {
 				start[0] = -1;
 				start[1] = -1;
+			} else if(end[0] == rowNum-1) {
+				end[0] = -1;
+				end[1] = -1;
 			}
+			
+			setRowNum(rowNum - 1);
 			
 			Node temp[][] = grid;
 			grid = null;
@@ -124,9 +151,8 @@ public class Grid {
 				}
 			}
 			
-			initGridNodes();
 		} else {
-			throw new RuntimeException("You cannot have less than 1 row"); //Might need to be a print statement
+			throw new RuntimeException("You cannot have less than 1 row");
 		}
 	}
 	
@@ -135,12 +161,15 @@ public class Grid {
 	 */
 	public void subtractColumn() {
 		if(columnNum > columnMin) {
-			setColumnNum(columnNum - 1);
-			
 			if(start[1] == columnNum-1) {
 				start[0] = -1;
 				start[1] = -1;
+			} else if(end[1] == columnNum-1) {
+				end[0] = -1;
+				end[1] = -1;
 			}
+			
+			setColumnNum(columnNum - 1);
 			
 			Node temp[][] = grid;
 			grid = null;
@@ -156,9 +185,8 @@ public class Grid {
 				}
 			}
 			
-			initGridNodes();
 		} else {
-			throw new RuntimeException("You cannot have less than 1 column"); //Might need to be a print statement
+			throw new RuntimeException("You cannot have less than 1 column");
 		}
 	}
 	
@@ -208,7 +236,7 @@ public class Grid {
 	 * If there is already a start space, replace it.
 	 */
 	public void addStart(int row, int column) {
-		//If you try make a space outside the grid the start, print an error
+		//If you try make a space outside the grid, print an error
 		if(row < 0 || column < 0 || row > rowNum-1 || column > columnNum-1) {
 			throw new RuntimeException("The selected space is not within the grid");
 		}
@@ -229,6 +257,28 @@ public class Grid {
 		}
 	}
 	
+	public void addEnd(int row, int column) {
+		//If you try make a space outside the grid, print an error
+		if(row < 0 || column < 0 || row > rowNum-1 || column > columnNum-1) {
+			throw new RuntimeException("The selected space is not within the grid");
+		}
+		
+		//If the start space already exists, change the start space
+		if(end[0] >= 0 && end[1] >= 0) {
+			System.out.printf("The end space has already been set at [%d][%d]\nWe will move the end to [%d][%d]\n", end[0], end[1], row, column);
+			grid[end[0]][end[1]].isEnd = false;
+			grid[row][column].setEnd(true);
+			end[0] = row;
+			end[1] = column;
+			
+		//If the start space doesn't exist, set the start space
+		} else {
+			grid[row][column].setEnd(true);
+			end[0] = row;
+			end[1] = column;
+		}
+	}
+	
 	
 	
 	
@@ -242,12 +292,15 @@ public class Grid {
 	public void printGrid() {
 		for(int i = 0; i < rowNum; i++) {
 			for(int j = 0; j < columnNum; j++) {
+				//System.out.printf("%s\n", grid[i][j].toString());
 				if(!(grid[i][j].isBarrier || grid[i][j].isEnd || grid[i][j].isStart)) {
 					System.out.printf(" 0 ");
 				} else if(grid[i][j].isStart) {
 					System.out.printf(" 1 ");
-				} else {
+				} else if(grid[i][j].isEnd){
 					System.out.printf(" 2 ");
+				} else {
+					System.out.printf(" 3 ");
 				}
 			}
 			System.out.println();
@@ -258,13 +311,7 @@ public class Grid {
 	
 	
 	public static void main(String[] args) {
-		Grid a = new Grid(2, 2);
-		a.printGrid();
-		a.addRow();
-		a.printGrid();
-		a.addColumn();
-		a.printGrid();
-		a.subtractColumn();
+		Grid a = new Grid(3, 3);
 		a.printGrid();
 		a.addStart(1, 1);
 		a.printGrid();
@@ -272,10 +319,10 @@ public class Grid {
 		a.addColumn();
 		a.printGrid();
 		a.addStart(2, 2);
+		a.addEnd(0, 0);
 		a.printGrid();
 		a.subtractColumn();
 		a.printGrid();
-		
 	}
 	
 }
