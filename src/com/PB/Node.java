@@ -4,36 +4,25 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Node {
-	public boolean discovered;
 	public HashMap<Node, List<Node>> neighbors;
 	public boolean isStart;
 	public boolean isEnd;
 	public boolean isBarrier;
 	
-	public Node(boolean discovered, HashMap<Node, List<Node>> neighbors, boolean isStart, boolean isEnd,
+	public Node(HashMap<Node, List<Node>> neighbors, boolean isStart, boolean isEnd,
 			boolean isBarrier) {
 		super();
-		this.discovered = discovered;
 		this.neighbors = neighbors;
 		this.isStart = isStart;
 		this.isEnd = isEnd;
 		this.isBarrier = isBarrier;
 	}
 	
-	public Node(boolean discovered, boolean isStart, boolean isEnd, boolean isBarrier) {
+	public Node(boolean isStart, boolean isEnd, boolean isBarrier) {
 		super();
-		this.discovered = discovered;
 		this.isStart = isStart;
 		this.isEnd = isEnd;
 		this.isBarrier = isBarrier;
-	}
-
-	public boolean isDiscovered() {
-		return discovered;
-	}
-
-	public void setDiscovered(boolean discovered) {
-		this.discovered = discovered;
 	}
 
 	public HashMap<Node, List<Node>> getNeighbors() {
@@ -70,7 +59,7 @@ public class Node {
 
 	@Override
 	public String toString() {
-		return "Node [discovered=" + discovered + ", neighbors=" + neighbors + ", isStart=" + isStart + ", isEnd="
+		return "Node [neighbors=" + neighbors + ", isStart=" + isStart + ", isEnd="
 				+ isEnd + ", isBarrier=" + isBarrier + "]";
 	}
 
