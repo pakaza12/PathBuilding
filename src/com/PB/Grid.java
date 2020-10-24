@@ -62,7 +62,7 @@ public class Grid {
 	
 	public void printStart() {
 		if(start[0] == -1 || start[1] == -1) {
-			System.out.printf("There is no start space\n");
+			System.out.printf("There is no start node\n");
 		} else {
 			System.out.printf("[%d][%d]\n", start[0], start[1]);
 		}
@@ -70,9 +70,15 @@ public class Grid {
 	
 	public void printEnd() {
 		if(end[0] == -1 || end[1] == -1) {
-			System.out.printf("There is no end space\n");
+			System.out.printf("There is no end node\n");
 		} else {
 			System.out.printf("[%d][%d]\n", end[0], end[1]);
+		}
+	}
+	
+	public void printBarriers() {
+		for(int i = 0; i < barrierList.size(); i++) {
+			System.out.printf("%d or [%d][%d] = %s\n", i, barrierList.get(i)[0], barrierList.get(i)[1], grid[barrierList.get(i)[0]][barrierList.get(i)[1]].toString());
 		}
 	}
 	
@@ -91,19 +97,25 @@ public class Grid {
 		/** 
 		 * Copies the nodes from the original grid 
 		 * into the new grid with one more row
+		 * and initialized new row
 		 */
-		for(int i = 0; i < rowNum-1; i++) {
+		for(int i = 0; i < rowNum; i++) {
 			for(int j = 0; j < columnNum; j++) {
-				grid[i][j] = temp[i][j];
+				if(i == rowNum-1) {
+					Node a = new Node(false, false, false);
+					grid[i][j] = a;
+				} else {
+					grid[i][j] = temp[i][j];
+				}
 			}
 		}
 		
-		initRowNodes();
 	}
 	
 	/**
 	 * Adds one column to the grid, then fills those new node
 	 * spaces with blank nodes
+	 * and initializes new column
 	 */
 	public void addColumn() {
 		/** Adds 1 to columnNum **/
@@ -118,12 +130,17 @@ public class Grid {
 		 * into the new grid with one more column
 		 */
 		for(int i = 0; i < rowNum; i++) {
-			for(int j = 0; j < columnNum-1; j++) {
-				grid[i][j] = temp[i][j];
+			for(int j = 0; j < columnNum; j++) {
+				if(j == columnNum-1) {
+					Node a = new Node(false, false, false);
+					grid[i][j] = a;
+				} else {
+					grid[i][j] = temp[i][j];
+				}
 			}
 		}
 		
-		initColumnNodes();
+
 	}
 	
 	/**
@@ -210,33 +227,6 @@ public class Grid {
 	}
 	
 	/**
-	 * Adds empty nodes into the new row within
-	 * the new, larger grid
-	 */
-	public void initRowNodes() {
-		for(int i = rowNum-1; i < rowNum; i++) {
-			for(int j = 0; j < columnNum; j++) {
-				Node a = new Node(false, false, false);
-				grid[i][j] = a;
-			}
-		}
-	}
-	
-	/**
-	 * Adds empty nodes into the new column within
-	 * the new, larger grid
-	 */
-	public void initColumnNodes() {
-		for(int i = 0; i < rowNum; i++) {
-			for(int j = columnNum-1; j < columnNum; j++) {
-				Node a = new Node(false, false, false);
-				grid[i][j] = a;
-			}
-		}
-	}
-	
-	//Make a function that can add a start, end, or barrier node
-	/**
 	 * Sets a node in the grid to a barrier, end, or start node.
 	 * 1 = start, 2 = end, 3 = barrier
 	 * @param row
@@ -244,10 +234,26 @@ public class Grid {
 	 * @param type
 	 */
 	public void addNode(int row, int column, int type) {
-		grid[row][column].setBarrier(false);
-		grid[row][column].setEnd(false);
-		grid[row][column].setStart(false);
+		//If it is already set to something else, set that thing to false
+		if(grid[row][column].isStart()) {
+			grid[row][column].setStart(false);
+			start[0] = -1;
+			start[1] = -1;
+		} else if(grid[row][column].isEnd()) {
+			grid[row][column].setEnd(false);
+			end[0] = -1;
+			end[1] = -1;
+		} else if(grid[row][column].isBarrier()) {
+			grid[row][column].setBarrier(false);
+			//Finds the barrier and deletes it from the barrierList
+			for(int i = 0; i < barrierList.size(); i++) {
+				if(barrierList.get(i)[0] == row && barrierList.get(i)[1] == column) {
+					barrierList.remove(i);
+				}
+			}
+		}
 		
+		//Depending on what you want to set the node to, set the node to that
 		switch(type) {
 			case 1:
 				grid[row][column].setStart(true);
@@ -277,54 +283,65 @@ public class Grid {
 	 */
 	public void addStart(int row, int column) {
 		if(row < 0 || row >= rowNum || column < 0 || column >= columnNum) {
-			throw new RuntimeException("The selected space is not within the grid");
+			throw new RuntimeException("The selected node is not within the grid");
 		}
 		
 		if(start[0] >= 0 && start[1] >= 0) {
-			System.out.printf("The start space has already been set at [%d][%d]\nWe will move the start node to [%d][%d]\n", start[0], start[1], row, column);
+			System.out.printf("The start node has already been set at [%d][%d]\nWe will move the start node to [%d][%d]\n", start[0], start[1], row, column);
 			grid[start[0]][start[1]].setStart(false);
 		}
 		addNode(row, column, 1);
 	}
 	
-	public void removeStart() {
-		if(start[0] >= 0 && start[1] >= 0 && start[0] < rowNum && start[1] < columnNum) {
-			grid[end[0]][end[1]].setEnd(false);
-		} else {
-			throw new RuntimeException("The selected space is not within the grid");
-		}
-		return;
-	}
-	
 	public void addEnd(int row, int column) {
 		if(row < 0 || row >= rowNum || column < 0 || column >= columnNum) {
-			throw new RuntimeException("The selected space is not within the grid");
+			throw new RuntimeException("The selected node is not within the grid");
 		}
 		
 		if(end[0] >= 0 && end[1] >= 0) {
-			System.out.printf("The end space has already been set at [%d][%d]\nWe will move the end node to [%d][%d]\n", end[0], end[1], row, column);
+			System.out.printf("The end node has already been set at [%d][%d]\nWe will move the end node to [%d][%d]\n", end[0], end[1], row, column);
 			grid[end[0]][end[1]].setStart(false);
 		}
 		addNode(row, column, 2);
 	}
 	
-	public void removeEnd() {
-		if(end[0] >= 0 && end[1] >= 0 && end[0] < rowNum && end[1] < columnNum) {
+	public void addBarrier(int row, int column) {
+		if(row < 0 || column < 0 || row > rowNum-1 || column > columnNum-1) {
+			throw new RuntimeException("The selected node is not within the grid");
+		}
+		
+		boolean notIn = true;
+		for(int i = 0; i < barrierList.size(); i++) {
+			if(barrierList.get(i)[0] == row && barrierList.get(i)[1] == column) {
+				notIn = false;
+				break;
+			}
+		}
+		if(notIn) {
+			addNode(row, column, 3);
+		}
+	}
+	
+	public void removeStart() {
+		if(start[0] >= 0 && start[1] >= 0 && start[0] < rowNum && start[1] < columnNum) {
 			grid[end[0]][end[1]].setEnd(false);
+			start[0] = -1;
+			start[1] = -1;
 		} else {
-			throw new RuntimeException("The selected space is not within the grid");
+			throw new RuntimeException("The selected node is not within the grid");
 		}
 		return;
 	}
 	
-	public void addBarrier(int row, int column) {
-		//If you try make a space outside the grid, print an error
-		if(row < 0 || column < 0 || row > rowNum-1 || column > columnNum-1) {
-			throw new RuntimeException("The selected space is not within the grid");
+	public void removeEnd() {
+		if(end[0] >= 0 && end[1] >= 0 && end[0] < rowNum && end[1] < columnNum) {
+			grid[end[0]][end[1]].setEnd(false);
+			end[0] = -1;
+			end[1] = -1;
+		} else {
+			throw new RuntimeException("The selected node is not within the grid");
 		}
-		
-		
-		
+		return;
 	}
 	
 	
@@ -357,18 +374,19 @@ public class Grid {
 	
 	public static void main(String[] args) {
 		Grid a = new Grid(3, 3);
-		a.printGrid();
-		a.addStart(1, 1);
-		a.printGrid();
 		a.addStart(0, 0);
 		a.addColumn();
 		a.printGrid();
 		a.addStart(2, 2);
 		a.addEnd(0, 0);
+		a.addBarrier(0, 0);
+		a.addBarrier(0, 1);
+		a.addEnd(0, 1);
 		a.printGrid();
-		a.subtractColumn();
-		a.removeEnd();
+		a.addBarrier(0, 1);
+		a.addEnd(2, 3);
 		a.printGrid();
+		a.printEnd();
 	}
 	
 }
