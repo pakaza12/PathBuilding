@@ -333,6 +333,9 @@ public class Grid {
 		return;
 	}
 	
+	/**
+	 * Removes the end node from the grid. If there is no end node, throw an error.
+	 */
 	public void removeEnd() {
 		if(end[0] >= 0 && end[1] >= 0 && end[0] < rowNum && end[1] < columnNum) {
 			grid[end[0]][end[1]].setEnd(false);
@@ -342,6 +345,42 @@ public class Grid {
 			throw new RuntimeException("The selected node is not within the grid");
 		}
 		return;
+	}
+	
+	/**
+	 * Removes a single barrier from the grid at the
+	 * given spot. If the spot is not a barrier, print
+	 * that the spot wasn't a grid.
+	 * @param row
+	 * @param column
+	 */
+	public void removeBarrier(int row, int column) {
+		if(row < 0 || row >= rowNum || column < 0 || column >= columnNum) {
+			throw new RuntimeException("The selected node is not within the grid");
+		}
+		
+		boolean isBarrierThere = true;
+		for(int i = 0; i < barrierList.size(); i++) {
+			if(barrierList.get(i)[0] == row && barrierList.get(i)[1] == column) {
+				barrierList.remove(i);
+				grid[row][column].setBarrier(false);
+				isBarrierThere = true;
+			}
+		}
+		
+		if(isBarrierThere) {
+			System.out.printf("The selected node [%d][%d] is not a barrier\n", row, column);
+		}
+	}
+	
+	/**
+	 * Removes all barriers from the grid.
+	 */
+	public void removeAllBarriers() {
+		for(int i = 0; i < barrierList.size(); i++) {
+			grid[barrierList.get(i)[0]][barrierList.get(i)[1]].setBarrier(false);;
+		}
+		barrierList.clear();
 	}
 	
 	
@@ -385,8 +424,10 @@ public class Grid {
 		a.printGrid();
 		a.addBarrier(0, 1);
 		a.addEnd(2, 3);
+		a.removeBarrier(0, 2);
 		a.printGrid();
 		a.printEnd();
+		a.printBarriers();
 	}
 	
 }
